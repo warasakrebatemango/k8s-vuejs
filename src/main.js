@@ -8,4 +8,4 @@ new Vue({
     render: h => h(App)
 }).$mount('#app')
 
-console.log(process.env)
+console.log("ENV Values", process.env)

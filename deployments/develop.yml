@@ -1,0 +1,22 @@
+steps:
+  #   - id: npminstall
+  - name: "gcr.io/cloud-builders/npm:node-10.10.0"
+    args: ["install"]
+  - name: "gcr.io/cloud-builders/npm:node-10.10.0"
+    args: ["run build"]
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA", "."]
+    volumes:
+      - name: credentials-test
+        path: "/secrets/credentials-test"
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA"]
+  - name: "gcr.io/cloud-builders/kubectl"
+    args:
+      - "set"
+      - "image"
+      - "deployments/warasak-testvuejs"
+      - "github_warasakrebatemango_k8s-vuejs=gcr.io/$PROJECT_ID/$REPO_NAME:$COMMIT_SHA"
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=asia-southeast1-b"
+      - "CLOUDSDK_CONTAINER_CLUSTER=rebate-cluster-dev"
